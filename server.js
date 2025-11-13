@@ -17,8 +17,16 @@ if (!process.env.GOOGLE_SERVICE_ACCOUNT_JSON) {
   process.exit(1);
 }
 
+let credentials;
+try {
+  credentials = JSON.parse(process.env.GOOGLE_SERVICE_ACCOUNT_JSON);
+} catch (err) {
+  console.error("❌ Error al parsear GOOGLE_SERVICE_ACCOUNT_JSON:", err.message);
+  process.exit(1);
+}
+
 const auth = new google.auth.GoogleAuth({
-  credentials: JSON.parse(process.env.GOOGLE_SERVICE_ACCOUNT_JSON),
+  credentials,
   scopes: SCOPES
 });
 
@@ -76,7 +84,7 @@ app.post("/upload", upload.array("files"), async (req, res) => {
     res.json({ status: "ok", message: "Fotos subidas correctamente 🎉", uploaded });
 
   } catch (err) {
-    console.error(err);
+    console.error("❌ Error al subir archivos:", err);
     res.status(500).json({ status: "error", message: err.message });
   }
 });
